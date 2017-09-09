@@ -4,117 +4,141 @@
 
 #include "stdafx.h"
 #include "sclass.h"
-
-int sudoku::getrow()
+int randomarr[9] = { 0 };
+int sudoku::judgerow(int row, int col)
 {
-	return row;
-}
-int sudoku::getcol()
-{
-	return col;
-}
-int sudoku::judgerow(int temp)
-{
-	for (int j = 0; j < getcol(); j++)
-	{
-		if (temp ==sudokuarr[row][j] )
-				return 0;
+	int t=sudokuarr[row][col];
+	for (int i = 0; i < col; i++)
+	{	
+		
+		if (t == sudokuarr[row][i])
+		{
+			return 0;
+		}
 	}
 	return 1;
 }
-int sudoku::judgecol(int temp)
+int sudoku::judgecol(int row,int col)
 {
-		for (int j = 0; j < getrow(); j++)
+	int t=sudokuarr[row][col];
+	for (int i = 0; i < row; i++)
+	{
+
+		if (t == sudokuarr[i][col])
 		{
-			if (temp == sudokuarr[j][col])
-				return 0;
+			return 0;
 		}
+	}
 	return 1;
 }
-int sudoku::judgeblock(int temp)
+int sudoku::judgeblock(int row,int col)
 {
-	int startRow = getrow() / 3 * 3;//确定当前填的数是第几个3*3方框中
-	int startCol = getcol() / 3 * 3;
+	int startRow = row / 3 * 3;
+	int startCol = col / 3 * 3;
 	for (int i = 0; i < 8; i++)
 	{
 		if (sudokuarr[startRow + i / 3][startCol + i % 3] == 0)
 		{
 			continue;
 		}
-		for (int j = i+1; j < 9; j++)
+		for ( int j = i+1; j < 9; j++)
 		{
-			if (sudokuarr[startRow + i/3][startCol + j%3] == temp)
+			if (sudokuarr[startRow + i / 3][startCol + i % 3] == sudokuarr[startRow + j / 3][startCol + j % 3])
 				return 0;
 		}
 	}
 	return 1;
 }
 
-int sudoku::setrand()
+void sudoku::getrand()
 {
-	srand((unsigned)time(NULL));
-	int temp = rand() % 9+1;
-	//cout << temp << endl;
-	return temp;
+	int randomrang[] = { 1,2,3,4,5,6,7,8,9 };
+	random_shuffle(randomrang, randomrang+9);
+	for (int i = 0; i < 9; i++)
+	{
+		randomarr[i] = randomrang[i];
+		//cout << randomrang[i] << " ";
+	}
+	count++;
+	//cout << endl;
+}
+void sudoku::setzero(int row)
+{
+	for (int j = 0; j < 9; j++)
+	{
+		sudokuarr[row][j] = 0;
+	}
+}
+int sudoku::judge(int row, int col)
+{
+	for (int i = 0; i < 9; i++)
+	{
+		sudokuarr[row][col] = randomarr[i];
+		if ((judgeblock(row, col) && judgecol(row, col) && judgerow(row, col)))
+		{
+			return 1;
+		}
+	}
+	return 0;
 }
 void sudoku::getsudoku()//生成数独终盘；
 {
-	int count=0;//产生随机数的次数；
-	int temp;
-	while (1)
+
+	int maxcount = 220;
+	int row = 0;
+	int col = 0;
+	for (row = 0; row < 9; row++)
 	{
-		if (col == 9 && row == 8)
-		{
-			break;
-		}
-		col = col % 9;
-		if (col == 0 && row == 0)
-		{
-			this->sudokuarr[row][col] = setrand();
-			this->col++;
-			//cout << row << " " << col<<" "<<count<<" "<<maxcount << endl;
+		if (row == 0)
+		{	
+			getrand();
+			count = 0;
+			for (int i = 0; i < 9; i++)
+			{
+				sudokuarr[row][i] = randomarr[i];
+			}
 		}
 		else
 		{
-			temp = setrand();
-			if (judgeblock(temp) && judgecol(temp) && judgerow(temp))
+			getrand();
+			for (col = 0; col < 9; col++)
 			{
-				this->sudokuarr[row][col] = temp;
-				this->col++;
-				if (this->col == 9)
+				if (count < maxcount)
 				{
-					this->row++;
+					if (!judge(row, col))
+					{
+						setzero(row);
+						row--;
+						col = 8;
+						getrand();
+					}
+					//cout << count << " " << row << " " << col << endl;
 				}
-				cout << row << " " << col <<" "<<temp<< endl;
-				count = 0;
-			}
-			else
-			{
-				count++;
-			}
-		}
-		if (count == maxcount)//超过最大阀值重置；
-		{
-			for (int i = 0; i < 9; i++)
-			{
-				for (int j = 0; j < 9; j++)
+				else
 				{
-					this->sudokuarr[i][j] = 0;
+					row = -1;
+					col = 8;
+					for (int i = 0; i < 9; i++)
+					{
+						for (int j = 0; j < 9; j++)
+						{
+							sudokuarr[i][j] = 0;
+						}
+					}
+					count = 0;
 				}
 			}
-			col = 0;
-			row = 0;
-			count = 0;
 		}
 	}
 }
+
 void sudoku::print()
 {
 	for (int i = 0; i < 9; i++)
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			cout << this->sudokuarr[i][j] << " ";
+			cout << sudokuarr[i][j] << " ";
 		}
 		cout << endl;
 	}
@@ -132,6 +156,7 @@ int main()
 
 		sudo.print();
 	}
+	cin >> n;
     return 0;
 }
 
