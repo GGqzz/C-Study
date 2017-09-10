@@ -1,4 +1,5 @@
 #pragma once
+
 class sudoku {
 private:
 	int sudokuarr[9][9];//存放数独的数组；

@@ -4,13 +4,14 @@
 
 #include "stdafx.h"
 #include "sclass.h"
+
 int randomarr[9] = { 0 };
 int sudoku::judgerow(int row, int col)
 {
-	int t=sudokuarr[row][col];
+	int t = sudokuarr[row][col];
 	for (int i = 0; i < col; i++)
-	{	
-		
+	{
+
 		if (t == sudokuarr[row][i])
 		{
 			return 0;
@@ -18,9 +19,9 @@ int sudoku::judgerow(int row, int col)
 	}
 	return 1;
 }
-int sudoku::judgecol(int row,int col)
+int sudoku::judgecol(int row, int col)
 {
-	int t=sudokuarr[row][col];
+	int t = sudokuarr[row][col];
 	for (int i = 0; i < row; i++)
 	{
 
@@ -31,20 +32,25 @@ int sudoku::judgecol(int row,int col)
 	}
 	return 1;
 }
-int sudoku::judgeblock(int row,int col)
+int sudoku::judgeblock(int row, int col)
 {
+	/*
+		用一个一维数组存放九宫格的数
+		如果九宫格的某个值对应的数组下标的数组元素有值，且不为
+		0，那么就表示九宫格存在重复得恶数字
+	*/
 	int startRow = row / 3 * 3;
 	int startCol = col / 3 * 3;
-	for (int i = 0; i < 8; i++)
+	int temp[10];
+	for (int i = 0; i < 3; i++)
 	{
-		if (sudokuarr[startRow + i / 3][startCol + i % 3] == 0)
+
+		for (int j = 0; j < 3; j++)
 		{
-			continue;
-		}
-		for ( int j = i+1; j < 9; j++)
-		{
-			if (sudokuarr[startRow + i / 3][startCol + i % 3] == sudokuarr[startRow + j / 3][startCol + j % 3])
+			if (temp[sudokuarr[startRow + i][startCol + j]] == sudokuarr[startRow + i][startCol + j] && sudokuarr[startRow + i][startCol + j] != 0)
 				return 0;
+			else
+				temp[sudokuarr[startRow + i][startCol + j]] = sudokuarr[startRow + i][startCol + j];
 		}
 	}
 	return 1;
@@ -53,7 +59,7 @@ int sudoku::judgeblock(int row,int col)
 void sudoku::getrand()
 {
 	int randomrang[] = { 1,2,3,4,5,6,7,8,9 };
-	random_shuffle(randomrang, randomrang+9);
+	random_shuffle(randomrang, randomrang + 9);
 	for (int i = 0; i < 9; i++)
 	{
 		randomarr[i] = randomrang[i];
@@ -90,7 +96,7 @@ void sudoku::getsudoku()//生成数独终盘；
 	for (row = 0; row < 9; row++)
 	{
 		if (row == 0)
-		{	
+		{
 			getrand();
 			count = 0;
 			for (int i = 0; i < 9; i++)
@@ -151,12 +157,10 @@ int main()
 	sudoku sudo;
 	for (int i = 0; i < n; i++)
 	{
-		
 		sudo.getsudoku();
-
 		sudo.print();
 	}
-	cin >> n;
+	cin>> n;
     return 0;
 }
 
